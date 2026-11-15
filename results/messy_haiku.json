@@ -1,0 +1,1814 @@
+[
+ {
+  "id": "q01",
+  "kind": "fact",
+  "run": 1,
+  "verdict": "pass",
+  "reason": "",
+  "questions": "questions_messy.json",
+  "mcp": "mcp_messy.json",
+  "asp": null,
+  "name": "q01_r1",
+  "answer": "The last order before October 1, 2026 was placed by **Ben Okafor** (order #9, dated 2026-09-20, \u20ac30.00).\n\nOne order has a non-standard date, #4 (\"12/10/2026\"). It falls after October 1 under either reading (December 10 or October 12), so it doesn't change the answer.",
+  "turns": 6,
+  "tool_calls": 5,
+  "calls": [
+   [
+    "list_tables",
+    {}
+   ],
+   [
+    "describe_table",
+    {
+     "table": "orders"
+    }
+   ],
+   [
+    "describe_table",
+    {
+     "table": "customers"
+    }
+   ],
+   [
+    "run_query",
+    {
+     "sql": "SELECT o.id, o.ordered_on, o.total_eur, c.name FROM orders o LEFT JOIN customers c ON c.id = o.customer_id WHERE o.ordered_on < '2026-10-01' ORDER BY o.ordered_on DESC, o.id DESC LIMIT 5"
+    }
+   ],
+   [
+    "run_query",
+    {
+     "sql": "SELECT id, ordered_on FROM orders WHERE ordered_on NOT GLOB '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]' OR ordered_on >= '2026-10-01' ORDER BY ordered_on"
+    }
+   ]
+  ],
+  "cost_usd": 0.00178736,
+  "subtype": "success",
+  "model": "claude-haiku-5-5",
+  "stderr": ""
+ },
+ {
+  "id": "q02",
+  "kind": "fact",
+  "run": 1,
+  "verdict": "pass",
+  "reason": "",
+  "questions": "questions_messy.json",
+  "mcp": "mcp_messy.json",
+  "asp": null,
+  "name": "q02_r1",
+  "answer": "**Ben Okafor (customer ID 2) has the highest average order value at \u20ac82.50.** He has two orders totalling \u20ac165.00.\n\nTwo things to be aware of:\n- There's a second customer named Ben Okafor (ID 6, one order of \u20ac30.00). The ranking is by customer ID, so the names alone don't distinguish them.\n- One order in the table has a NULL `total_eur`. It isn't part of Ben's two orders, so it doesn't affect this result, but it is excluded from every average.",
+  "turns": 6,
+  "tool_calls": 5,
+  "calls": [
+   [
+    "list_tables",
+    {}
+   ],
+   [
+    "describe_table",
+    {
+     "table": "orders"
+    }
+   ],
+   [
+    "describe_table",
+    {
+     "table": "customers"
+    }
+   ],
+   [
+    "run_query",
+    {
+     "sql": "SELECT c.id, c.name, COUNT(o.id) AS n_orders, ROUND(AVG(o.total_eur), 2) AS avg_eur, SUM(o.total_eur) AS total_eur FROM orders o JOIN customers c ON c.id = o.customer_id GROUP BY c.id, c.name ORDER BY avg_eur DESC LIMIT 5;"
+    }
+   ],
+   [
+    "run_query",
+    {
+     "sql": "SELECT COUNT(*) AS rows_total, COUNT(DISTINCT id) AS distinct_ids, SUM(total_eur IS NULL) AS null_totals, SUM(customer_id IS NULL) AS null_customers, SUM(customer_id NOT IN (SELECT id FROM customers)) AS orphan_orders FROM orders;"
+    }
+   ]
+  ],
+  "cost_usd": 0.0018961700000000002,
+  "subtype": "success",
+  "model": "claude-haiku-5-5",
+  "stderr": ""
+ },
+ {
+  "id": "q03",
+  "kind": "fact",
+  "run": 1,
+  "verdict": "pass",
+  "reason": "",
+  "questions": "questions_messy.json",
+  "mcp": "mcp_messy.json",
+  "asp": null,
+  "name": "q03_r1",
+  "answer": "The Taipei customer, Chen Wei, has spent **\u20ac90.00** in total across 2 orders. The orders table already stores amounts in euros (`total_eur`), so no conversion was needed.",
+  "turns": 5,
+  "tool_calls": 4,
+  "calls": [
+   [
+    "list_tables",
+    {}
+   ],
+   [
+    "describe_table",
+    {
+     "table": "customers"
+    }
+   ],
+   [
+    "describe_table",
+    {
+     "table": "orders"
+    }
+   ],
+   [
+    "run_query",
+    {
+     "sql": "SELECT c.id, c.name, c.city, COUNT(o.id) AS order_count, SUM(o.total_eur) AS total_eur FROM customers c LEFT JOIN orders o ON o.customer_id = c.id WHERE c.city LIKE '%Taipei%' GROUP BY c.id, c.name, c.city"
+    }
+   ]
+  ],
+  "cost_usd": 0.00147548,
+  "subtype": "success",
+  "model": "claude-haiku-5-5",
+  "stderr": ""
+ },
+ {
+  "id": "q04",
+  "kind": "fact",
+  "run": 1,
+  "verdict": "pass",
+  "reason": "",
+  "questions": "questions_messy.json",
+  "mcp": "mcp_messy.json",
+  "asp": null,
+  "name": "q04_r1",
+  "answer": "**Ben Okafor** (customer ID 2, Lagos) has spent the most, with **\u20ac165.00** across 2 orders.\n\nThe database has a second customer named Ben Okafor (ID 6, Accra) with \u20ac30.00 in spend. If that's the same person, their combined total would be \u20ac195.00. I grouped by customer ID, so I didn't merge them. The amounts are in EUR (`total_eur`).",
+  "turns": 5,
+  "tool_calls": 4,
+  "calls": [
+   [
+    "list_tables",
+    {}
+   ],
+   [
+    "describe_table",
+    {
+     "table": "customers"
+    }
+   ],
+   [
+    "describe_table",
+    {
+     "table": "orders"
+    }
+   ],
+   [
+    "run_query",
+    {
+     "sql": "SELECT c.id, c.name, c.city, ROUND(SUM(o.total_eur), 2) AS total_spent_eur, COUNT(o.id) AS order_count FROM customers c JOIN orders o ON o.customer_id = c.id GROUP BY c.id, c.name, c.city ORDER BY total_spent_eur DESC LIMIT 5"
+    }
+   ]
+  ],
+  "cost_usd": 0.00156929,
+  "subtype": "success",
+  "model": "claude-haiku-5-5",
+  "stderr": ""
+ },
+ {
+  "id": "q05",
+  "kind": "fact",
+  "run": 1,
+  "verdict": "pass",
+  "reason": "",
+  "questions": "questions_messy.json",
+  "mcp": "mcp_messy.json",
+  "asp": null,
+  "name": "q05_r1",
+  "answer": "The cheapest order with a recorded price was **order #6**, a Desk mat for **\u20ac19.00**, placed by **Dora Novak** of Prague on 2026-07-21.\n\nOrder #10 (Keyboard stand, placed by Emil Hansen in Oslo) sorts first, but its `total_eur` is NULL, so it has no recorded price. If you count it as the cheapest, it's the answer, but I don't know its real cost.",
+  "turns": 5,
+  "tool_calls": 4,
+  "calls": [
+   [
+    "list_tables",
+    {}
+   ],
+   [
+    "describe_table",
+    {
+     "table": "orders"
+    }
+   ],
+   [
+    "describe_table",
+    {
+     "table": "customers"
+    }
+   ],
+   [
+    "run_query",
+    {
+     "sql": "SELECT o.id, o.item, o.total_eur, o.ordered_on, c.name, c.city FROM orders o LEFT JOIN customers c ON c.id = o.customer_id ORDER BY o.total_eur ASC LIMIT 5"
+    }
+   ]
+  ],
+  "cost_usd": 0.0015149900000000001,
+  "subtype": "success",
+  "model": "claude-haiku-5-5",
+  "stderr": ""
+ },
+ {
+  "id": "q06",
+  "kind": "fact",
+  "run": 1,
+  "verdict": "pass",
+  "reason": "",
+  "questions": "questions_messy.json",
+  "mcp": "mcp_messy.json",
+  "asp": null,
+  "name": "q06_r1",
+  "answer": "None. Every customer has placed at least one order.\n\nI checked this by counting customers with no matching row in `orders`, which returned 0. The database has 6 customers, and all 6 appear in `orders`. There are no orphan orders, so the result isn't skewed by bad `customer_id` values.",
+  "turns": 6,
+  "tool_calls": 5,
+  "calls": [
+   [
+    "list_tables",
+    {}
+   ],
+   [
+    "describe_table",
+    {
+     "table": "customers"
+    }
+   ],
+   [
+    "describe_table",
+    {
+     "table": "orders"
+    }
+   ],
+   [
+    "run_query",
+    {
+     "sql": "SELECT COUNT(*) AS customers_without_orders FROM customers c WHERE NOT EXISTS (SELECT 1 FROM orders o WHERE o.customer_id = c.id)"
+    }
+   ],
+   [
+    "run_query",
+    {
+     "sql": "SELECT (SELECT COUNT(*) FROM customers) AS total_customers, (SELECT COUNT(DISTINCT customer_id) FROM orders) AS customers_with_orders, (SELECT COUNT(*) FROM orders WHERE customer_id IS NULL OR customer_id NOT IN (SELECT id FROM customers)) AS orphan_orders"
+    }
+   ]
+  ],
+  "cost_usd": 0.0013874500000000001,
+  "subtype": "success",
+  "model": "claude-haiku-5-5",
+  "stderr": ""
+ },
+ {
+  "id": "q07",
+  "kind": "fact",
+  "run": 1,
+  "verdict": "pass",
+  "reason": "",
+  "questions": "questions_messy.json",
+  "mcp": "mcp_messy.json",
+  "asp": null,
+  "name": "q07_r1",
+  "answer": "**Lagos accounts for 32.54% of all order revenue.** Lagos customers placed 2 orders totaling \u20ac165.00 out of \u20ac507.00 in total order value.\n\nI summed `total_eur` from the `orders` table and joined to `customers` on `customer_id` to get each city. Every order matched a customer, and no spelling variants of \"Lagos\" turned up.",
+  "turns": 5,
+  "tool_calls": 4,
+  "calls": [
+   [
+    "list_tables",
+    {}
+   ],
+   [
+    "describe_table",
+    {
+     "table": "customers"
+    }
+   ],
+   [
+    "describe_table",
+    {
+     "table": "orders"
+    }
+   ],
+   [
+    "run_query",
+    {
+     "sql": "SELECT c.city, COUNT(*) AS n_orders, ROUND(SUM(o.total_eur), 2) AS revenue_eur, ROUND(100.0 * SUM(o.total_eur) / (SELECT SUM(total_eur) FROM orders), 2) AS pct_of_total FROM orders o LEFT JOIN customers c ON c.id = o.customer_id GROUP BY c.city ORDER BY revenue_eur DESC"
+    }
+   ]
+  ],
+  "cost_usd": 0.0013424700000000001,
+  "subtype": "success",
+  "model": "claude-haiku-5-5",
+  "stderr": ""
+ },
+ {
+  "id": "q08",
+  "kind": "fact",
+  "run": 1,
+  "verdict": "pass",
+  "reason": "",
+  "questions": "questions_messy.json",
+  "mcp": "mcp_messy.json",
+  "asp": null,
+  "name": "q08_r1",
+  "answer": "The total value of all orders is **\u20ac507.00**.\n\nThis covers 10 orders. One of them has no `total_eur` value, so it is not included in the sum. If that order has a real amount, the total is higher than \u20ac507.00.",
+  "turns": 5,
+  "tool_calls": 4,
+  "calls": [
+   [
+    "list_tables",
+    {}
+   ],
+   [
+    "describe_table",
+    {
+     "table": "orders"
+    }
+   ],
+   [
+    "describe_table",
+    {
+     "table": "customers"
+    }
+   ],
+   [
+    "run_query",
+    {
+     "sql": "SELECT COUNT(*) AS order_count, SUM(total_eur) AS total_value_eur, SUM(total_eur IS NULL) AS null_totals FROM orders"
+    }
+   ]
+  ],
+  "cost_usd": 0.00116749,
+  "subtype": "success",
+  "model": "claude-haiku-5-5",
+  "stderr": ""
+ },
+ {
+  "id": "q09",
+  "kind": "fact",
+  "run": 1,
+  "verdict": "pass",
+  "reason": "",
+  "questions": "questions_messy.json",
+  "mcp": "mcp_messy.json",
+  "asp": null,
+  "name": "q09_r1",
+  "answer": "**112 days**, from 2026-07-21 (order 6) to 2026-11-10 (order 10).\n\nOne row is ambiguous. Order 4 is stored as `12/10/2026`, while every other date is ISO (`YYYY-MM-DD`). I didn't change it. The answer depends on how to read it:\n\n- **Read as 12 October (DD/MM):** the span is still 112 days, because the last order stays 2026-11-10.\n- **Read as 10 December (MM/DD):** the last order becomes 2026-12-10 and the span is 142 days. That date is after today (2026-11-14), so it's probably not the intended reading.\n\nThe data is 10 rows, and this is a read-only database, so I couldn't fix the stored value. You may want to correct order 4 to ISO format.",
+  "turns": 5,
+  "tool_calls": 4,
+  "calls": [
+   [
+    "list_tables",
+    {}
+   ],
+   [
+    "describe_table",
+    {
+     "table": "orders"
+    }
+   ],
+   [
+    "run_query",
+    {
+     "sql": "SELECT MIN(ordered_on) AS first_order, MAX(ordered_on) AS last_order, CAST(julianday(MAX(ordered_on)) - julianday(MIN(ordered_on)) AS INTEGER) AS days_between, COUNT(*) AS n FROM orders"
+    }
+   ],
+   [
+    "run_query",
+    {
+     "sql": "SELECT id, ordered_on FROM orders ORDER BY id"
+    }
+   ]
+  ],
+  "cost_usd": 0.00172944,
+  "subtype": "success",
+  "model": "claude-haiku-5-5",
+  "stderr": ""
+ },
+ {
+  "id": "q10",
+  "kind": "fact",
+  "run": 1,
+  "verdict": "pass",
+  "reason": "",
+  "questions": "questions_messy.json",
+  "mcp": "mcp_messy.json",
+  "asp": null,
+  "name": "q10_r1",
+  "answer": "**Emil Hansen** (Oslo) had the most expensive first order: a Headset for \u20ac75.00 on 2026-11-05.\n\nThe next highest first orders were Ben Okafor's Mouse (\u20ac45, Lagos) and Ana Costa's Desk lamp (\u20ac39). Emil's first order is also his only order before 2026-11-10, so the date ordering doesn't change the result.\n\nTwo data notes: there are two different customers named Ben Okafor (Lagos and Accra), and Chen Wei's order date is stored as `12/10/2026` instead of the ISO format used elsewhere. Neither affects this answer.",
+  "turns": 7,
+  "tool_calls": 6,
+  "calls": [
+   [
+    "list_tables",
+    {}
+   ],
+   [
+    "describe_table",
+    {
+     "table": "customers"
+    }
+   ],
+   [
+    "describe_table",
+    {
+     "table": "orders"
+    }
+   ],
+   [
+    "run_query",
+    {
+     "sql": "WITH first_orders AS (\n  SELECT o.customer_id, o.total_eur, o.ordered_on, o.id,\n         ROW_NUMBER() OVER (PARTITION BY o.customer_id ORDER BY o.ordered_on, o.id) AS rn\n  FROM orders o\n)\nSELECT c.name, c.city, f.item, f.total_eur, f.ordered_on, f.id\nFROM first_orders f\nJOIN customers c ON c.id = f.customer_id\nWHERE f.rn = 1\nORDER BY f.total_eur DESC\nLIMIT 5"
+    }
+   ],
+   [
+    "run_query",
+    {
+     "sql": "WITH first_orders AS (\n  SELECT o.customer_id, o.item, o.total_eur, o.ordered_on, o.id,\n         ROW_NUMBER() OVER (PARTITION BY o.customer_id ORDER BY o.ordered_on, o.id) AS rn\n  FROM orders o\n)\nSELECT c.name, c.city, f.item, f.total_eur, f.ordered_on, f.id\nFROM first_orders f\nJOIN customers c ON c.id = f.customer_id\nWHERE f.rn = 1\nORDER BY f.total_eur DESC\nLIMIT 5"
+    }
+   ],
+   [
+    "run_query",
+    {
+     "sql": "SELECT o.id, o.customer_id, c.name, c.city, o.item, o.total_eur, o.ordered_on\nFROM orders o LEFT JOIN customers c ON c.id = o.customer_id\nORDER BY o.customer_id, o.id"
+    }
+   ]
+  ],
+  "cost_usd": 0.0021910799999999998,
+  "subtype": "success",
+  "model": "claude-haiku-5-5",
+  "stderr": ""
+ },
+ {
+  "id": "q11",
+  "kind": "fact",
+  "run": 1,
+  "verdict": "pass",
+  "reason": "",
+  "questions": "questions_messy.json",
+  "mcp": "mcp_messy.json",
+  "asp": null,
+  "name": "q11_r1",
+  "answer": "**September 2026** had the highest total order revenue, at **\u20ac150.00** (Keyboard \u20ac120 + Cable \u20ac30).\n\nThe answer holds regardless of how one odd record is read. One order is dated `12/10/2026`, which could be 12 October or 10 December, and neither would beat September. Another order (Keyboard stand, 10 Nov) has no total, so it is excluded from the sums. November comes second at \u20ac140, and that figure would be higher only if the missing amount were filled in.",
+  "turns": 6,
+  "tool_calls": 5,
+  "calls": [
+   [
+    "list_tables",
+    {}
+   ],
+   [
+    "describe_table",
+    {
+     "table": "orders"
+    }
+   ],
+   [
+    "describe_table",
+    {
+     "table": "customers"
+    }
+   ],
+   [
+    "run_query",
+    {
+     "sql": "SELECT substr(ordered_on,1,7) AS month, SUM(total_eur) AS revenue_eur, COUNT(*) AS orders FROM orders GROUP BY month ORDER BY revenue_eur DESC LIMIT 5"
+    }
+   ],
+   [
+    "run_query",
+    {
+     "sql": "SELECT id, customer_id, item, total_eur, ordered_on FROM orders ORDER BY ordered_on"
+    }
+   ]
+  ],
+  "cost_usd": 0.00167162,
+  "subtype": "success",
+  "model": "claude-haiku-5-5",
+  "stderr": ""
+ },
+ {
+  "id": "q12",
+  "kind": "fact",
+  "run": 1,
+  "verdict": "pass",
+  "reason": "",
+  "questions": "questions_messy.json",
+  "mcp": "mcp_messy.json",
+  "asp": null,
+  "name": "q12_r1",
+  "answer": "The most expensive single order is **order #3**, a Keyboard for **\u20ac120.00**, placed on 2026-09-02. It was placed by **Ben Okafor** (customer ID 2, Lagos).\n\nThe next most expensive is order #2 (Monitor arm, \u20ac89.00, Ana Costa).",
+  "turns": 5,
+  "tool_calls": 4,
+  "calls": [
+   [
+    "list_tables",
+    {}
+   ],
+   [
+    "describe_table",
+    {
+     "table": "orders"
+    }
+   ],
+   [
+    "describe_table",
+    {
+     "table": "customers"
+    }
+   ],
+   [
+    "run_query",
+    {
+     "sql": "SELECT o.id, o.item, o.total_eur, o.ordered_on, c.id AS customer_id, c.name, c.city FROM orders o LEFT JOIN customers c ON c.id = o.customer_id ORDER BY o.total_eur DESC LIMIT 5"
+    }
+   ]
+  ],
+  "cost_usd": 0.0012539900000000002,
+  "subtype": "success",
+  "model": "claude-haiku-5-5",
+  "stderr": ""
+ },
+ {
+  "id": "q13",
+  "kind": "fact",
+  "run": 1,
+  "verdict": "pass",
+  "reason": "",
+  "questions": "questions_messy.json",
+  "mcp": "mcp_messy.json",
+  "asp": null,
+  "name": "q13_r1",
+  "answer": "Eleven full weeks passed between Ana Costa's first and second orders.\n\nHer first order was on 2026-08-14 and her second on 2026-10-30, which is 77 days apart (77 \u00f7 7 = 11). She is the only customer with that name in the database.",
+  "turns": 5,
+  "tool_calls": 4,
+  "calls": [
+   [
+    "list_tables",
+    {}
+   ],
+   [
+    "describe_table",
+    {
+     "table": "customers"
+    }
+   ],
+   [
+    "describe_table",
+    {
+     "table": "orders"
+    }
+   ],
+   [
+    "run_query",
+    {
+     "sql": "SELECT c.id, c.name, o.id AS order_id, o.ordered_on FROM customers c JOIN orders o ON o.customer_id = c.id WHERE c.name LIKE '%Ana Costa%' ORDER BY o.ordered_on"
+    }
+   ]
+  ],
+  "cost_usd": 0.00125304,
+  "subtype": "success",
+  "model": "claude-haiku-5-5",
+  "stderr": ""
+ },
+ {
+  "id": "q14",
+  "kind": "fact",
+  "run": 1,
+  "verdict": "pass",
+  "reason": "",
+  "questions": "questions_messy.json",
+  "mcp": "mcp_messy.json",
+  "asp": null,
+  "name": "q14_r1",
+  "answer": "The Headset was ordered once, on 2026-11-05 by Emil Hansen. Two other items were ordered in that same month (November 2026), so the answer depends on which one you mean:\n\n- **Webcam**, ordered 2026-11-03 by Chen Wei\n- **Keyboard stand**, ordered 2026-11-10 by Emil Hansen\n\nIf you want the one that isn't the Headset and was placed by a different customer, that's the **Webcam, by Chen Wei**. The Keyboard stand was also placed by Emil Hansen, the same customer as the Headset.",
+  "turns": 6,
+  "tool_calls": 5,
+  "calls": [
+   [
+    "list_tables",
+    {}
+   ],
+   [
+    "describe_table",
+    {
+     "table": "orders"
+    }
+   ],
+   [
+    "describe_table",
+    {
+     "table": "customers"
+    }
+   ],
+   [
+    "run_query",
+    {
+     "sql": "SELECT o.id, o.item, o.ordered_on, c.name FROM orders o LEFT JOIN customers c ON c.id = o.customer_id WHERE strftime('%Y-%m', o.ordered_on) = (SELECT strftime('%Y-%m', ordered_on) FROM orders WHERE item = 'Headset' LIMIT 1) ORDER BY o.ordered_on"
+    }
+   ],
+   [
+    "run_query",
+    {
+     "sql": "SELECT o.id, o.item, o.ordered_on, c.name FROM orders o LEFT JOIN customers c ON c.id = o.customer_id WHERE o.item = 'Headset' OR strftime('%Y-%m', o.ordered_on) = '2026-11' ORDER BY o.ordered_on"
+    }
+   ]
+  ],
+  "cost_usd": 0.0015774,
+  "subtype": "success",
+  "model": "claude-haiku-5-5",
+  "stderr": ""
+ },
+ {
+  "id": "q15",
+  "kind": "fact",
+  "run": 1,
+  "verdict": "pass",
+  "reason": "",
+  "questions": "questions_messy.json",
+  "mcp": "mcp_messy.json",
+  "asp": null,
+  "name": "q15_r1",
+  "answer": "Two customers have placed exactly one order: **Ben Okafor** and **Dora Novak**.\n\nI counted orders per customer in the `orders` table and kept those with a count of 1. Customers with no orders are not included.",
+  "turns": 5,
+  "tool_calls": 4,
+  "calls": [
+   [
+    "list_tables",
+    {}
+   ],
+   [
+    "describe_table",
+    {
+     "table": "customers"
+    }
+   ],
+   [
+    "describe_table",
+    {
+     "table": "orders"
+    }
+   ],
+   [
+    "run_query",
+    {
+     "sql": "SELECT c.id, c.name, COUNT(o.id) AS order_count FROM customers c JOIN orders o ON o.customer_id = c.id GROUP BY c.id, c.name HAVING COUNT(o.id) = 1 ORDER BY c.name"
+    }
+   ]
+  ],
+  "cost_usd": 0.0011823600000000001,
+  "subtype": "success",
+  "model": "claude-haiku-5-5",
+  "stderr": ""
+ },
+ {
+  "id": "n01",
+  "kind": "none",
+  "run": 1,
+  "verdict": "pass",
+  "reason": "",
+  "questions": "questions_messy.json",
+  "mcp": "mcp_messy.json",
+  "asp": null,
+  "name": "n01_r1",
+  "answer": "No customer lives in Berlin. I checked the `customers` table, which has `id`, `name`, and `city` columns. A case-insensitive, whitespace-trimmed search for \"Berlin\" returned no rows. The full list of distinct cities is Lisbon, Lagos, Taipei, Prague, Oslo, and Accra, so there's no spelling variant hiding a Berlin entry.",
+  "turns": 5,
+  "tool_calls": 4,
+  "calls": [
+   [
+    "list_tables",
+    {}
+   ],
+   [
+    "describe_table",
+    {
+     "table": "customers"
+    }
+   ],
+   [
+    "run_query",
+    {
+     "sql": "SELECT id, name, city FROM customers WHERE LOWER(TRIM(city)) = 'berlin';"
+    }
+   ],
+   [
+    "run_query",
+    {
+     "sql": "SELECT DISTINCT city FROM customers;"
+    }
+   ]
+  ],
+  "cost_usd": 0.00124379,
+  "subtype": "success",
+  "model": "claude-haiku-5-5",
+  "stderr": ""
+ },
+ {
+  "id": "n02",
+  "kind": "none",
+  "run": 1,
+  "verdict": "pass",
+  "reason": "",
+  "questions": "questions_messy.json",
+  "mcp": "mcp_messy.json",
+  "asp": null,
+  "name": "n02_r1",
+  "answer": "No customer placed an order in 2024. The `orders` table has 10 orders, and every one is dated 2026 (from 2026-07-21 through 2026-11-10, with one entered as 12/10/2026). I searched for any date containing \"2024\" in several formats and found nothing.\n\nFor reference, the customers with orders are Ana Costa, Ben Okafor, Chen Wei, Dora Novak, Emil Hansen, and one order (id 9) whose customer_id 6 resolves to a customer named Ben Okafor. If you expected 2024 orders, the data may be incomplete or loaded from a different source.",
+  "turns": 7,
+  "tool_calls": 6,
+  "calls": [
+   [
+    "list_tables",
+    {}
+   ],
+   [
+    "describe_table",
+    {
+     "table": "orders"
+    }
+   ],
+   [
+    "describe_table",
+    {
+     "table": "customers"
+    }
+   ],
+   [
+    "run_query",
+    {
+     "sql": "SELECT DISTINCT c.id, c.name, c.city, o.ordered_on, o.item, o.total_eur FROM orders o JOIN customers c ON c.id = o.customer_id WHERE o.ordered_on LIKE '2024%' ORDER BY o.ordered_on"
+    }
+   ],
+   [
+    "run_query",
+    {
+     "sql": "SELECT o.id, o.customer_id, o.ordered_on, typeof(o.ordered_on) AS t, c.id AS cid, c.name FROM orders o LEFT JOIN customers c ON c.id = o.customer_id ORDER BY o.ordered_on LIMIT 20"
+    }
+   ],
+   [
+    "run_query",
+    {
+     "sql": "SELECT o.id, o.customer_id, o.ordered_on, c.name FROM orders o LEFT JOIN customers c ON c.id = o.customer_id WHERE o.ordered_on LIKE '%2024%' OR o.ordered_on LIKE '%24'"
+    }
+   ]
+  ],
+  "cost_usd": 0.00169345,
+  "subtype": "success",
+  "model": "claude-haiku-5-5",
+  "stderr": ""
+ },
+ {
+  "id": "n03",
+  "kind": "none",
+  "run": 1,
+  "verdict": "pass",
+  "reason": "",
+  "questions": "questions_messy.json",
+  "mcp": "mcp_messy.json",
+  "asp": null,
+  "name": "n03_r1",
+  "answer": "No customer has a name starting with Z. I checked the `customers` table case-insensitively, and also ignoring leading whitespace, and found no matches. For good measure, I also searched for a \"z\" anywhere in the name and still found nothing.",
+  "turns": 5,
+  "tool_calls": 4,
+  "calls": [
+   [
+    "list_tables",
+    {}
+   ],
+   [
+    "describe_table",
+    {
+     "table": "customers"
+    }
+   ],
+   [
+    "run_query",
+    {
+     "sql": "SELECT id, name, city FROM customers WHERE name LIKE 'Z%'"
+    }
+   ],
+   [
+    "run_query",
+    {
+     "sql": "SELECT id, name, city FROM customers WHERE UPPER(TRIM(name)) LIKE 'Z%' OR name LIKE '%z%'"
+    }
+   ]
+  ],
+  "cost_usd": 0.0012804399999999999,
+  "subtype": "success",
+  "model": "claude-haiku-5-5",
+  "stderr": ""
+ },
+ {
+  "id": "n04",
+  "kind": "none",
+  "run": 1,
+  "verdict": "pass",
+  "reason": "",
+  "questions": "questions_messy.json",
+  "mcp": "mcp_messy.json",
+  "asp": null,
+  "name": "n04_r1",
+  "answer": "No order in the database is worth more than 1,000 euros, so there is no order to name and no customer who placed one.\n\nI checked the `orders` table, which has 10 rows. Nine have a real-number total between 19.00 and 120.00 euros. The tenth has a NULL total. The largest recorded total is 120.00 euros.\n\nIf you expected a larger order, the data may be incomplete or stored elsewhere. The NULL-total row could also be worth checking, since its real value is unknown.",
+  "turns": 6,
+  "tool_calls": 5,
+  "calls": [
+   [
+    "list_tables",
+    {}
+   ],
+   [
+    "describe_table",
+    {
+     "table": "orders"
+    }
+   ],
+   [
+    "describe_table",
+    {
+     "table": "customers"
+    }
+   ],
+   [
+    "run_query",
+    {
+     "sql": "SELECT o.id, o.item, o.total_eur, o.ordered_on, c.name, c.city FROM orders o LEFT JOIN customers c ON c.id = o.customer_id WHERE o.total_eur > 1000 ORDER BY o.total_eur DESC"
+    }
+   ],
+   [
+    "run_query",
+    {
+     "sql": "SELECT COUNT(*) AS n, MIN(total_eur) AS min_total, MAX(total_eur) AS max_total, typeof(total_eur) AS t FROM orders GROUP BY typeof(total_eur)"
+    }
+   ]
+  ],
+  "cost_usd": 0.00139648,
+  "subtype": "success",
+  "model": "claude-haiku-5-5",
+  "stderr": ""
+ },
+ {
+  "id": "n05",
+  "kind": "none",
+  "run": 1,
+  "verdict": "pass",
+  "reason": "",
+  "questions": "questions_messy.json",
+  "mcp": "mcp_messy.json",
+  "asp": null,
+  "name": "n05_r1",
+  "answer": "No one else placed an order on the same day as Dora Novak. She has one order in the database, a desk mat for \u20ac19.00 placed on 2026-07-21, and no other customer's orders fall on that date.",
+  "turns": 6,
+  "tool_calls": 5,
+  "calls": [
+   [
+    "list_tables",
+    {}
+   ],
+   [
+    "describe_table",
+    {
+     "table": "customers"
+    }
+   ],
+   [
+    "describe_table",
+    {
+     "table": "orders"
+    }
+   ],
+   [
+    "run_query",
+    {
+     "sql": "SELECT c.id, c.name, c.city, o.id AS order_id, o.item, o.total_eur, o.ordered_on FROM orders o JOIN customers c ON c.id = o.customer_id WHERE o.ordered_on IN (SELECT o2.ordered_on FROM orders o2 JOIN customers c2 ON c2.id = o2.customer_id WHERE c2.name LIKE '%Dora Novak%') AND c.name NOT LIKE '%Dora Novak%' ORDER BY o.ordered_on, c.name"
+    }
+   ],
+   [
+    "run_query",
+    {
+     "sql": "SELECT c.id, c.name, c.city, o.id AS order_id, o.item, o.total_eur, o.ordered_on FROM orders o JOIN customers c ON c.id = o.customer_id WHERE c.name LIKE '%Novak%' OR c.name LIKE '%Dora%'"
+    }
+   ]
+  ],
+  "cost_usd": 0.0014891300000000002,
+  "subtype": "success",
+  "model": "claude-haiku-5-5",
+  "stderr": ""
+ },
+ {
+  "id": "q01",
+  "kind": "fact",
+  "run": 2,
+  "verdict": "pass",
+  "reason": "",
+  "questions": "questions_messy.json",
+  "mcp": "mcp_messy.json",
+  "asp": null,
+  "name": "q01_r2",
+  "answer": "**Ben Okafor** placed the last order before October 1, 2026: order #9 (Cable, \u20ac30.00) on 2026-09-20.\n\nThe one order dated in a different format (`12/10/2026`) falls after October 1 under either reading, so it doesn't change the answer. Ben Okafor appears under two customer IDs (6 and 2), which may be a duplicate customer record. I went by the name shown.",
+  "turns": 6,
+  "tool_calls": 5,
+  "calls": [
+   [
+    "list_tables",
+    {}
+   ],
+   [
+    "describe_table",
+    {
+     "table": "orders"
+    }
+   ],
+   [
+    "describe_table",
+    {
+     "table": "customers"
+    }
+   ],
+   [
+    "run_query",
+    {
+     "sql": "SELECT o.id, o.customer_id, c.name, o.item, o.total_eur, o.ordered_on FROM orders o LEFT JOIN customers c ON c.id = o.customer_id WHERE o.ordered_on < '2026-10-01' ORDER BY o.ordered_on DESC, o.id DESC LIMIT 10"
+    }
+   ],
+   [
+    "run_query",
+    {
+     "sql": "SELECT ordered_on FROM orders WHERE ordered_on NOT LIKE '____-__-__' LIMIT 20"
+    }
+   ]
+  ],
+  "cost_usd": 0.00158813,
+  "subtype": "success",
+  "model": "claude-haiku-5-5",
+  "stderr": ""
+ },
+ {
+  "id": "q02",
+  "kind": "fact",
+  "run": 2,
+  "verdict": "pass",
+  "reason": "",
+  "questions": "questions_messy.json",
+  "mcp": "mcp_messy.json",
+  "asp": null,
+  "name": "q02_r2",
+  "answer": "**Ben Okafor (customer ID 2) has the highest average order value at \u20ac82.50**, based on two orders.\n\nThe `orders` table stores amounts in a `total_eur` column, so no currency conversion was needed.\n\nThere is a second customer named Ben Okafor (ID 6) with one order of \u20ac30.00. The name alone doesn't identify a customer, so check the ID if you're acting on this result.",
+  "turns": 5,
+  "tool_calls": 4,
+  "calls": [
+   [
+    "list_tables",
+    {}
+   ],
+   [
+    "describe_table",
+    {
+     "table": "customers"
+    }
+   ],
+   [
+    "describe_table",
+    {
+     "table": "orders"
+    }
+   ],
+   [
+    "run_query",
+    {
+     "sql": "SELECT c.id, c.name, COUNT(o.id) AS order_count, ROUND(AVG(o.total_eur), 2) AS avg_order_eur FROM customers c JOIN orders o ON o.customer_id = c.id GROUP BY c.id, c.name ORDER BY avg_order_eur DESC LIMIT 5"
+    }
+   ]
+  ],
+  "cost_usd": 0.00126164,
+  "subtype": "success",
+  "model": "claude-haiku-5-5",
+  "stderr": ""
+ },
+ {
+  "id": "q03",
+  "kind": "fact",
+  "run": 2,
+  "verdict": "pass",
+  "reason": "",
+  "questions": "questions_messy.json",
+  "mcp": "mcp_messy.json",
+  "asp": null,
+  "name": "q03_r2",
+  "answer": "The Taipei customer, Chen Wei (customer ID 3), has spent **\u20ac90.00** in total across 2 orders.\n\nI matched the city with `LIKE '%Taipei%'`, so this would miss a record spelled in another script, such as \u53f0\u5317. I didn't check for that.",
+  "turns": 5,
+  "tool_calls": 4,
+  "calls": [
+   [
+    "list_tables",
+    {}
+   ],
+   [
+    "describe_table",
+    {
+     "table": "customers"
+    }
+   ],
+   [
+    "describe_table",
+    {
+     "table": "orders"
+    }
+   ],
+   [
+    "run_query",
+    {
+     "sql": "SELECT c.id, c.name, c.city, COUNT(o.id) AS order_count, SUM(o.total_eur) AS total_eur FROM customers c LEFT JOIN orders o ON o.customer_id = c.id WHERE c.city LIKE '%Taipei%' GROUP BY c.id, c.name, c.city"
+    }
+   ]
+  ],
+  "cost_usd": 0.00124948,
+  "subtype": "success",
+  "model": "claude-haiku-5-5",
+  "stderr": ""
+ },
+ {
+  "id": "q04",
+  "kind": "fact",
+  "run": 2,
+  "verdict": "pass",
+  "reason": "",
+  "questions": "questions_messy.json",
+  "mcp": "mcp_messy.json",
+  "asp": null,
+  "name": "q04_r2",
+  "answer": "**Ben Okafor (customer ID 2, Lagos) has spent the most: \u20ac165.00 across 2 orders.**\n\nThe totals are in EUR, from the `total_eur` column. Ana Costa is second with \u20ac128.00.\n\nThere are two customers named Ben Okafor, with IDs 2 (Lagos) and 6 (Accra). I treated them as separate customers. If they are the same person, their combined spend is \u20ac195.00 (\u20ac165.00 + \u20ac30.00), which would put them first by a wider margin. Let me know if you want that combined figure instead.",
+  "turns": 5,
+  "tool_calls": 4,
+  "calls": [
+   [
+    "list_tables",
+    {}
+   ],
+   [
+    "describe_table",
+    {
+     "table": "customers"
+    }
+   ],
+   [
+    "describe_table",
+    {
+     "table": "orders"
+    }
+   ],
+   [
+    "run_query",
+    {
+     "sql": "SELECT c.id, c.name, c.city, ROUND(SUM(o.total_eur), 2) AS total_spent_eur, COUNT(o.id) AS order_count FROM orders o JOIN customers c ON c.id = o.customer_id GROUP BY c.id, c.name, c.city ORDER BY total_spent_eur DESC LIMIT 5"
+    }
+   ]
+  ],
+  "cost_usd": 0.00134352,
+  "subtype": "success",
+  "model": "claude-haiku-5-5",
+  "stderr": ""
+ },
+ {
+  "id": "q05",
+  "kind": "fact",
+  "run": 2,
+  "verdict": "pass",
+  "reason": "",
+  "questions": "questions_messy.json",
+  "mcp": "mcp_messy.json",
+  "asp": null,
+  "name": "q05_r2",
+  "answer": "The cheapest order with a recorded price is **order 6**: a Desk mat for **\u20ac19.00**, placed on 2026-07-21 by **Dora Novak** of Prague.\n\nOrder 10 (Keyboard stand, Emil Hansen, Oslo) sorts first in an ascending price query, but its `total_eur` is NULL, so it has no known price. If it has a real price that's missing from the data, it could be cheaper than \u20ac19.00.",
+  "turns": 5,
+  "tool_calls": 4,
+  "calls": [
+   [
+    "list_tables",
+    {}
+   ],
+   [
+    "describe_table",
+    {
+     "table": "orders"
+    }
+   ],
+   [
+    "describe_table",
+    {
+     "table": "customers"
+    }
+   ],
+   [
+    "run_query",
+    {
+     "sql": "SELECT o.id, o.item, o.total_eur, o.ordered_on, c.name, c.city FROM orders o LEFT JOIN customers c ON c.id = o.customer_id ORDER BY o.total_eur ASC LIMIT 5"
+    }
+   ]
+  ],
+  "cost_usd": 0.0012848400000000002,
+  "subtype": "success",
+  "model": "claude-haiku-5-5",
+  "stderr": ""
+ },
+ {
+  "id": "q06",
+  "kind": "fact",
+  "run": 2,
+  "verdict": "pass",
+  "reason": "",
+  "questions": "questions_messy.json",
+  "mcp": "mcp_messy.json",
+  "asp": null,
+  "name": "q06_r2",
+  "answer": "None. Every customer has at least one order.\n\nThe database has 6 customers, and all 6 appear in the `orders` table. I also checked for orders with a missing `customer_id` (there are none), so the result isn't skewed by bad data.",
+  "turns": 6,
+  "tool_calls": 5,
+  "calls": [
+   [
+    "list_tables",
+    {}
+   ],
+   [
+    "describe_table",
+    {
+     "table": "customers"
+    }
+   ],
+   [
+    "describe_table",
+    {
+     "table": "orders"
+    }
+   ],
+   [
+    "run_query",
+    {
+     "sql": "SELECT COUNT(*) AS customers_without_orders FROM customers c WHERE NOT EXISTS (SELECT 1 FROM orders o WHERE o.customer_id = c.id)"
+    }
+   ],
+   [
+    "run_query",
+    {
+     "sql": "SELECT (SELECT COUNT(*) FROM customers) AS total_customers, (SELECT COUNT(DISTINCT customer_id) FROM orders) AS customers_with_orders, (SELECT COUNT(*) FROM orders WHERE customer_id IS NULL) AS null_customer_orders"
+    }
+   ]
+  ],
+  "cost_usd": 0.0013764900000000002,
+  "subtype": "success",
+  "model": "claude-haiku-5-5",
+  "stderr": ""
+ },
+ {
+  "id": "q07",
+  "kind": "fact",
+  "run": 2,
+  "verdict": "pass",
+  "reason": "",
+  "questions": "questions_messy.json",
+  "mcp": "mcp_messy.json",
+  "asp": null,
+  "name": "q07_r2",
+  "answer": "Lagos customers account for **about 32.5%** of order revenue.\n\nLagos orders total \u20ac165.00 out of \u20ac507.00 across all orders (2 of 11 orders). I summed `total_eur` from `orders`, joined to `customers` on `customer_id`. Every order matched a customer, and no other city name variants for Lagos turned up.",
+  "turns": 5,
+  "tool_calls": 4,
+  "calls": [
+   [
+    "list_tables",
+    {}
+   ],
+   [
+    "describe_table",
+    {
+     "table": "customers"
+    }
+   ],
+   [
+    "describe_table",
+    {
+     "table": "orders"
+    }
+   ],
+   [
+    "run_query",
+    {
+     "sql": "SELECT c.city, COUNT(*) AS n, SUM(o.total_eur) AS revenue FROM orders o LEFT JOIN customers c ON c.id = o.customer_id GROUP BY c.city ORDER BY revenue DESC"
+    }
+   ]
+  ],
+  "cost_usd": 0.00127234,
+  "subtype": "success",
+  "model": "claude-haiku-5-5",
+  "stderr": ""
+ },
+ {
+  "id": "q08",
+  "kind": "fact",
+  "run": 2,
+  "verdict": "pass",
+  "reason": "",
+  "questions": "questions_messy.json",
+  "mcp": "mcp_messy.json",
+  "asp": null,
+  "name": "q08_r2",
+  "answer": "The total value of all orders is **\u20ac507.00**.\n\nOne of the 10 orders has no `total_eur` value, so the sum covers the other 9. I didn't look into why that order is missing its price.",
+  "turns": 5,
+  "tool_calls": 4,
+  "calls": [
+   [
+    "list_tables",
+    {}
+   ],
+   [
+    "describe_table",
+    {
+     "table": "orders"
+    }
+   ],
+   [
+    "describe_table",
+    {
+     "table": "customers"
+    }
+   ],
+   [
+    "run_query",
+    {
+     "sql": "SELECT SUM(total_eur) AS total_value_eur, COUNT(*) AS order_count, COUNT(total_eur) AS priced_orders FROM orders"
+    }
+   ]
+  ],
+  "cost_usd": 0.00116105,
+  "subtype": "success",
+  "model": "claude-haiku-5-5",
+  "stderr": ""
+ },
+ {
+  "id": "q09",
+  "kind": "fact",
+  "run": 2,
+  "verdict": "pass",
+  "reason": "",
+  "questions": "questions_messy.json",
+  "mcp": "mcp_messy.json",
+  "asp": null,
+  "name": "q09_r2",
+  "answer": "**112 days** between the first order (2026-07-21, order 6) and the last order (2026-11-10, order 10).\n\nOrder 4 has a date written as `12/10/2026`, which doesn't match the other rows' `YYYY-MM-DD` format. I read it as 12 October 2026 (day/month). That reading doesn't change the result: as 10 December it would be in the future, since today is 2026-11-14, so it can't be the last order. Either way it falls inside the range and doesn't set either endpoint. The database stores this column as text, so the mixed format is worth fixing at the source.",
+  "turns": 5,
+  "tool_calls": 4,
+  "calls": [
+   [
+    "list_tables",
+    {}
+   ],
+   [
+    "describe_table",
+    {
+     "table": "orders"
+    }
+   ],
+   [
+    "run_query",
+    {
+     "sql": "SELECT MIN(ordered_on) AS first_order, MAX(ordered_on) AS last_order, CAST(julianday(MAX(ordered_on)) - julianday(MIN(ordered_on)) AS INTEGER) AS days_between, COUNT(*) AS n FROM orders"
+    }
+   ],
+   [
+    "run_query",
+    {
+     "sql": "SELECT id, ordered_on FROM orders ORDER BY id"
+    }
+   ]
+  ],
+  "cost_usd": 0.00163502,
+  "subtype": "success",
+  "model": "claude-haiku-5-5",
+  "stderr": ""
+ },
+ {
+  "id": "q10",
+  "kind": "fact",
+  "run": 2,
+  "verdict": "pass",
+  "reason": "",
+  "questions": "questions_messy.json",
+  "mcp": "mcp_messy.json",
+  "asp": null,
+  "name": "q10_r2",
+  "answer": "**Emil Hansen** had the most expensive first order: a Headset for \u20ac75.00 on 2026-11-05.\n\nThe ranking holds whichever way the ambiguous date is read. Chen Wei's `12/10/2026` could be 10 December or 12 October, but Chen Wei's first order is at most \u20ac65 either way, below \u20ac75. The next-highest first orders are Ben Okafor (customer 2) at \u20ac45 and Ana Costa at \u20ac39.",
+  "turns": 7,
+  "tool_calls": 6,
+  "calls": [
+   [
+    "list_tables",
+    {}
+   ],
+   [
+    "describe_table",
+    {
+     "table": "customers"
+    }
+   ],
+   [
+    "describe_table",
+    {
+     "table": "orders"
+    }
+   ],
+   [
+    "run_query",
+    {
+     "sql": "WITH first_orders AS (\n  SELECT o.customer_id, o.total_eur, o.ordered_on, o.id,\n         ROW_NUMBER() OVER (PARTITION BY o.customer_id ORDER BY o.ordered_on ASC, o.id ASC) AS rn\n  FROM orders o\n)\nSELECT c.name, c.id, f.ordered_on, f.total_eur, f.item\nFROM first_orders f\nJOIN customers c ON c.id = f.customer_id\nWHERE f.rn = 1\nORDER BY f.total_eur DESC\nLIMIT 5;"
+    }
+   ],
+   [
+    "run_query",
+    {
+     "sql": "WITH first_orders AS (\n  SELECT o.customer_id, o.total_eur, o.ordered_on, o.id, o.item,\n         ROW_NUMBER() OVER (PARTITION BY o.customer_id ORDER BY o.ordered_on ASC, o.id ASC) AS rn\n  FROM orders o\n)\nSELECT c.name, c.id, f.ordered_on, f.total_eur, f.item\nFROM first_orders f\nJOIN customers c ON c.id = f.customer_id\nWHERE f.rn = 1\nORDER BY f.total_eur DESC\nLIMIT 5;"
+    }
+   ],
+   [
+    "run_query",
+    {
+     "sql": "SELECT o.id, o.customer_id, c.name, o.item, o.total_eur, o.ordered_on\nFROM orders o LEFT JOIN customers c ON c.id = o.customer_id\nORDER BY o.customer_id, o.id;"
+    }
+   ]
+  ],
+  "cost_usd": 0.0022266000000000005,
+  "subtype": "success",
+  "model": "claude-haiku-5-5",
+  "stderr": ""
+ },
+ {
+  "id": "q11",
+  "kind": "fact",
+  "run": 2,
+  "verdict": "pass",
+  "reason": "",
+  "questions": "questions_messy.json",
+  "mcp": "mcp_messy.json",
+  "asp": null,
+  "name": "q11_r2",
+  "answer": "**September 2026** had the highest total order revenue, at **\u20ac150.00** (the Keyboard \u20ac120 and Cable \u20ac30 orders).\n\nTwo data issues could affect this:\n\n- **Missing price:** Order 10 (Keyboard stand, 2026-11-10) has no `total_eur`, so it's excluded from every month. November's recorded total is \u20ac140, but if the stand cost more than \u20ac10, November would overtake September. I'd need the price to rule that out.\n- **Inconsistent date:** Order 4 (USB hub, \u20ac25) is stored as `12/10/2026`, which I couldn't place in a month with certainty. It falls in neither September nor November under either reading, so it doesn't change the answer.",
+  "turns": 6,
+  "tool_calls": 5,
+  "calls": [
+   [
+    "list_tables",
+    {}
+   ],
+   [
+    "describe_table",
+    {
+     "table": "orders"
+    }
+   ],
+   [
+    "describe_table",
+    {
+     "table": "customers"
+    }
+   ],
+   [
+    "run_query",
+    {
+     "sql": "SELECT substr(ordered_on,1,7) AS month, SUM(total_eur) AS revenue_eur, COUNT(*) AS orders FROM orders GROUP BY month ORDER BY revenue_eur DESC LIMIT 5"
+    }
+   ],
+   [
+    "run_query",
+    {
+     "sql": "SELECT id, customer_id, item, total_eur, ordered_on FROM orders ORDER BY ordered_on"
+    }
+   ]
+  ],
+  "cost_usd": 0.0016754800000000002,
+  "subtype": "success",
+  "model": "claude-haiku-5-5",
+  "stderr": ""
+ },
+ {
+  "id": "q12",
+  "kind": "fact",
+  "run": 2,
+  "verdict": "pass",
+  "reason": "",
+  "questions": "questions_messy.json",
+  "mcp": "mcp_messy.json",
+  "asp": null,
+  "name": "q12_r2",
+  "answer": "The most expensive single order is **order #3**, a Keyboard for **\u20ac120.00**, placed on 2026-09-02. It was placed by **Ben Okafor** (customer ID 2, Lagos).",
+  "turns": 5,
+  "tool_calls": 4,
+  "calls": [
+   [
+    "list_tables",
+    {}
+   ],
+   [
+    "describe_table",
+    {
+     "table": "orders"
+    }
+   ],
+   [
+    "describe_table",
+    {
+     "table": "customers"
+    }
+   ],
+   [
+    "run_query",
+    {
+     "sql": "SELECT o.id, o.item, o.total_eur, o.ordered_on, c.id AS customer_id, c.name, c.city FROM orders o LEFT JOIN customers c ON c.id = o.customer_id ORDER BY o.total_eur DESC LIMIT 5"
+    }
+   ]
+  ],
+  "cost_usd": 0.0012324900000000001,
+  "subtype": "success",
+  "model": "claude-haiku-5-5",
+  "stderr": ""
+ },
+ {
+  "id": "q13",
+  "kind": "fact",
+  "run": 2,
+  "verdict": "pass",
+  "reason": "",
+  "questions": "questions_messy.json",
+  "mcp": "mcp_messy.json",
+  "asp": null,
+  "name": "q13_r2",
+  "answer": "Eleven full weeks passed between Ana Costa's first and second orders.\n\n- First order: Desk lamp, 2026-08-14\n- Second order: Monitor arm, 2026-10-30\n- That is 77 days apart, which is exactly 11 weeks.",
+  "turns": 5,
+  "tool_calls": 4,
+  "calls": [
+   [
+    "list_tables",
+    {}
+   ],
+   [
+    "describe_table",
+    {
+     "table": "customers"
+    }
+   ],
+   [
+    "describe_table",
+    {
+     "table": "orders"
+    }
+   ],
+   [
+    "run_query",
+    {
+     "sql": "SELECT c.id, c.name, o.id AS order_id, o.item, o.ordered_on FROM customers c JOIN orders o ON o.customer_id = c.id WHERE c.name LIKE '%Ana Costa%' ORDER BY o.ordered_on"
+    }
+   ]
+  ],
+  "cost_usd": 0.0012690400000000001,
+  "subtype": "success",
+  "model": "claude-haiku-5-5",
+  "stderr": ""
+ },
+ {
+  "id": "q14",
+  "kind": "fact",
+  "run": 2,
+  "verdict": "pass",
+  "reason": "",
+  "questions": "questions_messy.json",
+  "mcp": "mcp_messy.json",
+  "asp": null,
+  "name": "q14_r2",
+  "answer": "The Headset was ordered on 2026-11-05 by Emil Hansen (Oslo). Two other items were ordered in November 2026:\n\n- **Webcam**, ordered 2026-11-03 by Chen Wei (Taipei)\n- **Keyboard stand**, ordered 2026-11-10 by Emil Hansen (Oslo)\n\nSince you asked for \"the other item,\" you may have meant one specific order. If so, tell me which one and I'll narrow it down. Otherwise, both match.",
+  "turns": 5,
+  "tool_calls": 4,
+  "calls": [
+   [
+    "list_tables",
+    {}
+   ],
+   [
+    "describe_table",
+    {
+     "table": "orders"
+    }
+   ],
+   [
+    "describe_table",
+    {
+     "table": "customers"
+    }
+   ],
+   [
+    "run_query",
+    {
+     "sql": "SELECT o.id, o.item, o.ordered_on, c.name, c.city FROM orders o LEFT JOIN customers c ON c.id = o.customer_id WHERE strftime('%Y-%m', o.ordered_on) IN (SELECT strftime('%Y-%m', ordered_on) FROM orders WHERE item LIKE '%headset%') ORDER BY o.ordered_on"
+    }
+   ]
+  ],
+  "cost_usd": 0.00134409,
+  "subtype": "success",
+  "model": "claude-haiku-5-5",
+  "stderr": ""
+ },
+ {
+  "id": "q15",
+  "kind": "fact",
+  "run": 2,
+  "verdict": "pass",
+  "reason": "",
+  "questions": "questions_messy.json",
+  "mcp": "mcp_messy.json",
+  "asp": null,
+  "name": "q15_r2",
+  "answer": "Two customers have placed exactly one order: **Ben Okafor** and **Dora Novak**.\n\nI counted orders per customer with an inner join, so customers with zero orders are excluded. That matches the question, since they haven't placed any order.",
+  "turns": 5,
+  "tool_calls": 4,
+  "calls": [
+   [
+    "list_tables",
+    {}
+   ],
+   [
+    "describe_table",
+    {
+     "table": "customers"
+    }
+   ],
+   [
+    "describe_table",
+    {
+     "table": "orders"
+    }
+   ],
+   [
+    "run_query",
+    {
+     "sql": "SELECT c.id, c.name, COUNT(o.id) AS order_count FROM customers c JOIN orders o ON o.customer_id = c.id GROUP BY c.id, c.name HAVING COUNT(o.id) = 1 ORDER BY c.name"
+    }
+   ]
+  ],
+  "cost_usd": 0.00117824,
+  "subtype": "success",
+  "model": "claude-haiku-5-5",
+  "stderr": ""
+ },
+ {
+  "id": "n01",
+  "kind": "none",
+  "run": 2,
+  "verdict": "pass",
+  "reason": "",
+  "questions": "questions_messy.json",
+  "mcp": "mcp_messy.json",
+  "asp": null,
+  "name": "n01_r2",
+  "answer": "No customer lives in Berlin. The `customers` table has six distinct cities: Accra, Lagos, Lisbon, Oslo, Prague, and Taipei. A case-insensitive search for \"berlin\" returned no rows, so there's no spelling variant to catch either.",
+  "turns": 5,
+  "tool_calls": 4,
+  "calls": [
+   [
+    "list_tables",
+    {}
+   ],
+   [
+    "describe_table",
+    {
+     "table": "customers"
+    }
+   ],
+   [
+    "run_query",
+    {
+     "sql": "SELECT id, name, city FROM customers WHERE city LIKE '%berlin%'"
+    }
+   ],
+   [
+    "run_query",
+    {
+     "sql": "SELECT DISTINCT city FROM customers ORDER BY city"
+    }
+   ]
+  ],
+  "cost_usd": 0.00123491,
+  "subtype": "success",
+  "model": "claude-haiku-5-5",
+  "stderr": ""
+ },
+ {
+  "id": "n02",
+  "kind": "none",
+  "run": 2,
+  "verdict": "pass",
+  "reason": "",
+  "questions": "questions_messy.json",
+  "mcp": "mcp_messy.json",
+  "asp": null,
+  "name": "n02_r2",
+  "answer": "No customer placed an order in 2024. The `orders` table has 10 rows, and every `ordered_on` value is in 2026: nine are ISO dates like `2026-08-14`, and one is `12/10/2026`. A search for \"2024\" anywhere in that column returned nothing.",
+  "turns": 7,
+  "tool_calls": 6,
+  "calls": [
+   [
+    "list_tables",
+    {}
+   ],
+   [
+    "describe_table",
+    {
+     "table": "orders"
+    }
+   ],
+   [
+    "describe_table",
+    {
+     "table": "customers"
+    }
+   ],
+   [
+    "run_query",
+    {
+     "sql": "SELECT DISTINCT c.id, c.name, c.city, o.ordered_on FROM orders o JOIN customers c ON c.id = o.customer_id WHERE o.ordered_on LIKE '2024%' ORDER BY o.ordered_on"
+    }
+   ],
+   [
+    "run_query",
+    {
+     "sql": "SELECT ordered_on, typeof(ordered_on), COUNT(*) FROM orders GROUP BY substr(ordered_on,1,4) ORDER BY 1 LIMIT 50"
+    }
+   ],
+   [
+    "run_query",
+    {
+     "sql": "SELECT o.id, o.customer_id, c.name, o.ordered_on FROM orders o LEFT JOIN customers c ON c.id = o.customer_id WHERE o.ordered_on LIKE '%2024%'"
+    }
+   ]
+  ],
+  "cost_usd": 0.00163255,
+  "subtype": "success",
+  "model": "claude-haiku-5-5",
+  "stderr": ""
+ },
+ {
+  "id": "n03",
+  "kind": "none",
+  "run": 2,
+  "verdict": "pass",
+  "reason": "",
+  "questions": "questions_messy.json",
+  "mcp": "mcp_messy.json",
+  "asp": null,
+  "name": "n03_r2",
+  "answer": "No customer has a name starting with Z. I checked the `customers` table for names beginning with \"Z\" (case-insensitive, ignoring leading spaces) and also for any name containing a \"z\" anywhere, and both searches returned no rows.",
+  "turns": 5,
+  "tool_calls": 4,
+  "calls": [
+   [
+    "list_tables",
+    {}
+   ],
+   [
+    "describe_table",
+    {
+     "table": "customers"
+    }
+   ],
+   [
+    "run_query",
+    {
+     "sql": "SELECT id, name, city FROM customers WHERE name LIKE 'Z%'"
+    }
+   ],
+   [
+    "run_query",
+    {
+     "sql": "SELECT id, name, city FROM customers WHERE LOWER(TRIM(name)) LIKE 'z%' OR LOWER(name) LIKE '%z%'"
+    }
+   ]
+  ],
+  "cost_usd": 0.00128304,
+  "subtype": "success",
+  "model": "claude-haiku-5-5",
+  "stderr": ""
+ },
+ {
+  "id": "n04",
+  "kind": "none",
+  "run": 2,
+  "verdict": "pass",
+  "reason": "",
+  "questions": "questions_messy.json",
+  "mcp": "mcp_messy.json",
+  "asp": null,
+  "name": "n04_r2",
+  "answer": "No order in the database is worth more than 1,000 euros, so there is no customer to name.\n\nI checked all 10 orders. The largest recorded total is 120.00 EUR and the smallest is 19.00 EUR. One order, ID 10 (a \"Keyboard stand\" from customer 5, dated 2026-11-10), has a NULL total, so its value is unknown. Nothing in the data suggests it's large, but I can't rule it out. If its real price is available somewhere else, I can check it against the 1,000 EUR threshold.",
+  "turns": 7,
+  "tool_calls": 6,
+  "calls": [
+   [
+    "list_tables",
+    {}
+   ],
+   [
+    "describe_table",
+    {
+     "table": "orders"
+    }
+   ],
+   [
+    "describe_table",
+    {
+     "table": "customers"
+    }
+   ],
+   [
+    "run_query",
+    {
+     "sql": "SELECT o.id, o.item, o.total_eur, o.ordered_on, c.name, c.city FROM orders o LEFT JOIN customers c ON c.id = o.customer_id WHERE o.total_eur > 1000 ORDER BY o.total_eur DESC"
+    }
+   ],
+   [
+    "run_query",
+    {
+     "sql": "SELECT COUNT(*) AS n, MAX(total_eur) AS max_total, MIN(total_eur) AS min_total, SUM(CASE WHEN typeof(total_eur) NOT IN ('real','integer') THEN 1 ELSE 0 END) AS non_numeric, MAX(CAST(total_eur AS REAL)) AS max_cast FROM orders"
+    }
+   ],
+   [
+    "run_query",
+    {
+     "sql": "SELECT o.id, o.customer_id, o.item, o.total_eur, typeof(o.total_eur) AS t, o.ordered_on FROM orders o WHERE typeof(o.total_eur) NOT IN ('real','integer')"
+    }
+   ]
+  ],
+  "cost_usd": 0.00166203,
+  "subtype": "success",
+  "model": "claude-haiku-5-5",
+  "stderr": ""
+ },
+ {
+  "id": "n05",
+  "kind": "none",
+  "run": 2,
+  "verdict": "pass",
+  "reason": "",
+  "questions": "questions_messy.json",
+  "mcp": "mcp_messy.json",
+  "asp": null,
+  "name": "n05_r2",
+  "answer": "No one else placed an order on the same day as Dora Novak. She is the only customer with an order on 2026-07-21, which is her one order in the database (order 6, Desk mat, \u20ac19.00).",
+  "turns": 7,
+  "tool_calls": 6,
+  "calls": [
+   [
+    "list_tables",
+    {}
+   ],
+   [
+    "describe_table",
+    {
+     "table": "orders"
+    }
+   ],
+   [
+    "describe_table",
+    {
+     "table": "customers"
+    }
+   ],
+   [
+    "run_query",
+    {
+     "sql": "SELECT c.id, c.name, c.city, o.id AS order_id, o.item, o.total_eur, o.ordered_on FROM orders o JOIN customers c ON c.id = o.customer_id WHERE o.ordered_on = (SELECT o2.ordered_on FROM orders o2 JOIN customers c2 ON c2.id = o2.customer_id WHERE c2.name = 'Dora Novak' LIMIT 1) AND c.name <> 'Dora Novak' ORDER BY o.ordered_on, c.name"
+    }
+   ],
+   [
+    "run_query",
+    {
+     "sql": "SELECT c.id, c.name, c.city, o.id AS order_id, o.item, o.total_eur, o.ordered_on FROM customers c LEFT JOIN orders o ON o.customer_id = c.id WHERE c.name LIKE '%Dora%' OR c.name LIKE '%Novak%' ORDER BY o.ordered_on"
+    }
+   ],
+   [
+    "run_query",
+    {
+     "sql": "SELECT c.id, c.name, c.city, o.id AS order_id, o.item, o.total_eur, o.ordered_on FROM orders o LEFT JOIN customers c ON c.id = o.customer_id WHERE o.ordered_on = '2026-07-21'"
+    }
+   ]
+  ],
+  "cost_usd": 0.0017845600000000001,
+  "subtype": "success",
+  "model": "claude-haiku-5-5",
+  "stderr": ""
+ }
+]

@@ -1,0 +1,262 @@
+[
+ {
+  "id": "q01",
+  "name": "q01_r1",
+  "judge": "pass",
+  "judge_reason": "The agent names Ben Okafor, whose order on 2026-09-02 is the last before October 1, 2026, which matches the key answer \"Okafor.\"",
+  "judge_cost": 0.0013668600000000001,
+  "judge_model": [
+   "claude-haiku-5-5"
+  ],
+  "scorer_v3": "pass",
+  "scorer_reason": "",
+  "answer": "**Ben Okafor** placed the last order before October 1, 2026: a keyboard, ordered on 2026-09-02 (order #3).\n\nOnly four orders fall before that date, and none of the others shares that date. The latest of the rest was 2026-08-19, also from Ben Okafor."
+ },
+ {
+  "id": "q02",
+  "name": "q02_r1",
+  "judge": "fail",
+  "judge_reason": "The agent names Ana Costa and gives an order count, but never identifies the customer with the highest average order value (Okafor) or the \u20ac82.5 average.",
+  "judge_cost": 0.0013320600000000001,
+  "judge_model": [
+   "claude-haiku-5-5"
+  ],
+  "scorer_v3": "fail",
+  "scorer_reason": "wrong",
+  "answer": "Ana Costa has placed **2 orders**. She's customer #1 in Lisbon, and she's the only customer with that name in the database."
+ },
+ {
+  "id": "q03",
+  "name": "q03_r1",
+  "judge": "pass",
+  "judge_reason": "The agent's core answer of \u20ac90.00 matches the key fact of 90, and the extra table and caveats don't change it.",
+  "judge_cost": 0.00137286,
+  "judge_model": [
+   "claude-haiku-5-5"
+  ],
+  "scorer_v3": "pass",
+  "scorer_reason": "",
+  "answer": "The customer from Taipei, Chen Wei, has spent **\u20ac90.00** in total.\n\n| Customer | City | Orders | Total (EUR) |\n|---|---|---|---|\n| Chen Wei | Taipei | 2 | 90.00 |\n\nChen Wei is the only customer in the database with a Taipei address, so there is no ambiguity about which customer is meant. The total comes from summing the order totals on their two orders, which are already stored in euros."
+ },
+ {
+  "id": "q04",
+  "name": "q04_r1",
+  "judge": "pass",
+  "judge_reason": "The agent names Ben Okafor (surname Okafor) with a total of \u20ac165, matching the correct answer of Okafor, 165.",
+  "judge_cost": 0.00134986,
+  "judge_model": [
+   "claude-haiku-5-5"
+  ],
+  "scorer_v3": "pass",
+  "scorer_reason": "",
+  "answer": "**Ben Okafor** has spent the most: **\u20ac165.00** in total, over 2 orders.\n\n| Rank | Customer | Total spent | Orders |\n|---|---|---|---|\n| 1 | Ben Okafor | \u20ac165.00 | 2 |\n| 2 | Ana Costa | \u20ac128.00 | 2 |\n| 3 | Chen Wei | \u20ac90.00 | 2 |\n| 4 | Emil Hansen | \u20ac75.00 | 1 |\n| 5 | Dora Novak | \u20ac19.00 | 1 |\n\nI got these by adding up `total_eur` from the `orders` table for each customer. All amounts are in euros."
+ },
+ {
+  "id": "q05",
+  "name": "q05_r1",
+  "judge": "pass",
+  "judge_reason": "The agent names the cheapest order as the desk mat and identifies Dora Novak as the customer, matching both key facts.",
+  "judge_cost": 0.0013316600000000001,
+  "judge_model": [
+   "claude-haiku-5-5"
+  ],
+  "scorer_v3": "pass",
+  "scorer_reason": "",
+  "answer": "The cheapest order was **order #6, a desk mat for \u20ac19.00**. Dora Novak from Prague placed it on 2026-07-21.\n\nThe next cheapest was a USB hub for \u20ac25.00, ordered by Chen Wei."
+ },
+ {
+  "id": "q06",
+  "name": "q06_r1",
+  "judge": "pass",
+  "judge_reason": "The agent correctly says no customers lack orders, which matches the expected answer of zero, and its per-customer order counts support that.",
+  "judge_cost": 0.00089284,
+  "judge_model": [
+   "claude-haiku-5-5"
+  ],
+  "scorer_v3": "pass",
+  "scorer_reason": "",
+  "answer": "**None of them.** All 5 customers in the database have placed at least one order.\n\n| Customer | Orders |\n|---|---|\n| Ana Costa | 2 |\n| Ben Okafor | 2 |\n| Chen Wei | 2 |\n| Dora Novak | 1 |\n| Emil Hansen | 1 |\n\nI counted a customer as having ordered if at least one row in `orders` has their ID in `customer_id`."
+ },
+ {
+  "id": "q07",
+  "name": "q07_r1",
+  "judge": "fail",
+  "judge_reason": "The agent answered how many orders were placed in August 2026, not what share of order revenue came from Lagos customers, so the 34.6% figure is missing.",
+  "judge_cost": 0.0008782400000000001,
+  "judge_model": [
+   "claude-haiku-5-5"
+  ],
+  "scorer_v3": "fail",
+  "scorer_reason": "wrong",
+  "answer": "**2 orders** were placed in August 2026, one on 2026-08-14 and one on 2026-08-19.\n\nAll dates in the `orders` table use the same YYYY-MM-DD format, so the count doesn't miss any orders stored in a different format. The table has 8 orders in total, dated from July to November 2026."
+ },
+ {
+  "id": "q08",
+  "name": "q08_r1",
+  "judge": "pass",
+  "judge_reason": "The agent's total of \u20ac477.00 matches the correct answer of 477, and the extra detail about the order range does not change it.",
+  "judge_cost": 0.0008574400000000001,
+  "judge_model": [
+   "claude-haiku-5-5"
+  ],
+  "scorer_v3": "pass",
+  "scorer_reason": "",
+  "answer": "All orders add up to **\u20ac477.00**.\n\nThat's the sum of the `total_eur` column across all 8 orders in the `orders` table. Every order has a value, ranging from \u20ac19.00 to \u20ac120.00, so none were left out of the total."
+ },
+ {
+  "id": "q09",
+  "name": "q09_r1",
+  "judge": "pass",
+  "judge_reason": "The agent's 107 days matches the key, and 2026-07-21 to 2026-11-05 is indeed 107 days.",
+  "judge_cost": 0.0009201400000000001,
+  "judge_model": [
+   "claude-haiku-5-5"
+  ],
+  "scorer_v3": "pass",
+  "scorer_reason": "",
+  "answer": "**107 days** passed between the first and last order.\n\n- **First order:** 2026-07-21\n- **Last order:** 2026-11-05\n\nThat's from the `orders` table, which has 8 orders. Every `ordered_on` value is a valid date, so finding the earliest and latest by sorting the text gives the right answer."
+ },
+ {
+  "id": "q10",
+  "name": "q10_r1",
+  "judge": "pass",
+  "judge_reason": "The agent names Hansen (Emil Hansen) as the customer with the most expensive first order (\u20ac75.00), matching the key answer.",
+  "judge_cost": 0.00096064,
+  "judge_model": [
+   "claude-haiku-5-5"
+  ],
+  "scorer_v3": "pass",
+  "scorer_reason": "",
+  "answer": "The answer is **Emil Hansen**. Their first order was a headset for \u20ac75.00 on 2026-11-05. It's also their only order.\n\nEach customer's first order, by order date:\n\n| Customer | First order | Date | Total |\n|---|---|---|---|\n| **Emil Hansen** | Headset | 2026-11-05 | **\u20ac75.00** |\n| Ben Okafor | Mouse | 2026-08-19 | \u20ac45.00 |\n| Ana Costa | Desk lamp | 2026-08-14 | \u20ac39.00 |\n| Chen Wei | USB hub | 2026-10-12 | \u20ac25.00 |\n| Dora Novak | Desk mat | 2026-07-21 | \u20ac19.00 |\n\nI picked each customer's first order by date, not by order ID. That matters for Ben Okafor: their keyboard order (\u20ac120, 2026-09-02) has a lower ID than their mouse order, but the mouse was ordered earlier. If you went by ID instead, the keyboard would count as Ben's first order, and Ben would be the answer."
+ },
+ {
+  "id": "q11",
+  "name": "q11_r1",
+  "judge": "fail",
+  "judge_reason": "The agent answered about Ben Okafor's most recent order and never identified the month with the highest total order revenue or its euro amount.",
+  "judge_cost": 0.00086984,
+  "judge_model": [
+   "claude-haiku-5-5"
+  ],
+  "scorer_v3": "fail",
+  "scorer_reason": "wrong",
+  "answer": "Ben Okafor's most recent order was a **Keyboard**. They ordered it on 2026-09-02 for \u20ac120.00 (order #3).\n\nThey have one other order: a Mouse on 2026-08-19 for \u20ac45.00. Ben Okafor in Lagos is the only customer with that surname in the database."
+ },
+ {
+  "id": "q12",
+  "name": "q12_r1",
+  "judge": "pass",
+  "judge_reason": "The agent names the Keyboard order (\u20ac120.00) as the most expensive single order and Ben Okafor as the customer, matching both key facts.",
+  "judge_cost": 0.0008823400000000001,
+  "judge_model": [
+   "claude-haiku-5-5"
+  ],
+  "scorer_v3": "pass",
+  "scorer_reason": "",
+  "answer": "The most expensive single order is order #3, a **Keyboard for \u20ac120.00**. **Ben Okafor** from Lagos placed it on 2026-09-02.\n\nThe next largest is order #2, a monitor arm for \u20ac89.00 from Ana Costa in Lisbon, so the top order is clearly ahead."
+ },
+ {
+  "id": "q13",
+  "name": "q13_r1",
+  "judge": "fail",
+  "judge_reason": "The agent answered how many orders were over \u20ac50, not how many full weeks passed between Ana Costa's first and second orders (the correct answer is 11).",
+  "judge_cost": 0.0008977400000000001,
+  "judge_model": [
+   "claude-haiku-5-5"
+  ],
+  "scorer_v3": "fail",
+  "scorer_reason": "wrong",
+  "answer": "**4 orders** were over \u20ac50, out of 8 orders in total. No orders came to exactly \u20ac50 and none were missing a total, so it makes no difference whether \"over\" includes \u20ac50."
+ },
+ {
+  "id": "q14",
+  "name": "q14_r1",
+  "judge": "fail",
+  "judge_reason": "The agent answered a different question about customers with exactly two orders, and never named the other item (Webcam) or the buyer (Chen Wei).",
+  "judge_cost": 0.00088744,
+  "judge_model": [
+   "claude-haiku-5-5"
+  ],
+  "scorer_v3": "fail",
+  "scorer_reason": "wrong",
+  "answer": "**3 customers** have placed exactly two orders. They are customer IDs 1, 2 and 3.\n\nI counted the rows in the `orders` table for each customer. All three IDs also exist in the `customers` table, so none of these orders belong to a missing or deleted customer."
+ },
+ {
+  "id": "q15",
+  "name": "q15_r1",
+  "judge": "pass",
+  "judge_reason": "The agent names Dora Novak and Emil Hansen, matching the two customers the key lists as having exactly one order.",
+  "judge_cost": 0.0008634400000000001,
+  "judge_model": [
+   "claude-haiku-5-5"
+  ],
+  "scorer_v3": "pass",
+  "scorer_reason": "",
+  "answer": "Two customers have placed exactly one order:\n\n- **Dora Novak**\n- **Emil Hansen**\n\nI counted each customer's orders in the `orders` table and kept those with a count of one. Customers with no orders aren't included."
+ },
+ {
+  "id": "n01",
+  "name": "n01_r1",
+  "judge": "pass",
+  "judge_reason": "The agent correctly says no customer lives in Berlin, which matches the empty correct answer.",
+  "judge_cost": 0.00087094,
+  "judge_model": [
+   "claude-haiku-5-5"
+  ],
+  "scorer_v3": "pass",
+  "scorer_reason": "",
+  "answer": "No customer lives in Berlin. The `customers` table only has customers in Lisbon, Lagos, Taipei, Prague and Oslo. I also checked the `orders` table, but it has no address or city field, so nothing there points to Berlin either.\n\nIf you meant one of those cities, or want to see the customers in one of them, just say which."
+ },
+ {
+  "id": "n02",
+  "name": "n02_r1",
+  "judge": "pass",
+  "judge_reason": "The agent correctly says no customer placed an order in 2024, which matches the empty expected answer, and its table of 2026 orders supports that.",
+  "judge_cost": 0.00095744,
+  "judge_model": [
+   "claude-haiku-5-5"
+  ],
+  "scorer_v3": "pass",
+  "scorer_reason": "",
+  "answer": "No customer placed an order in 2024, according to this database.\n\nThe `orders` table has only 8 orders, and every one is dated between July and November 2026:\n\n| Order | Customer | Item | Total (\u20ac) | Date |\n|---|---|---|---|---|\n| 6 | Dora Novak | Desk mat | 19.00 | 2026-07-21 |\n| 1 | Ana Costa | Desk lamp | 39.00 | 2026-08-14 |\n| 8 | Ben Okafor | Mouse | 45.00 | 2026-08-19 |\n| 3 | Ben Okafor | Keyboard | 120.00 | 2026-09-02 |\n| 4 | Chen Wei | USB hub | 25.00 | 2026-10-12 |\n| 2 | Ana Costa | Monitor arm | 89.00 | 2026-10-30 |\n| 5 | Chen Wei | Webcam | 65.00 | 2026-11-03 |\n| 7 | Emil Hansen | Headset | 75.00 | 2026-11-05 |\n\nThe dates are all stored in the same `YYYY-MM-DD` format, so the search didn't miss any because of formatting. If you meant 2026, or orders from 2024 should be stored somewhere else like an archive database, tell me and I'll look there."
+ },
+ {
+  "id": "n03",
+  "name": "n03_r1",
+  "judge": "pass",
+  "judge_reason": "The agent correctly says no customer name starts with Z, which matches the empty correct answer.",
+  "judge_cost": 0.0009224400000000001,
+  "judge_model": [
+   "claude-haiku-5-5"
+  ],
+  "scorer_v3": "pass",
+  "scorer_reason": "",
+  "answer": "No customer's name starts with Z. The `customers` table has only 5 customers, and sorted alphabetically their names run from \"Ana Costa\" to \"Emil Hansen.\"\n\nI also checked for lowercase letters and leading spaces, and no name contains a \"z\" anywhere. If you're thinking of a particular person, they may not have been added to the database yet."
+ },
+ {
+  "id": "n04",
+  "name": "n04_r1",
+  "judge": "pass",
+  "judge_reason": "The key is an empty list, meaning no order exceeds 1,000 euros, and the agent correctly says none does, with the largest order at \u20ac120.",
+  "judge_cost": 0.0009994399999999999,
+  "judge_model": [
+   "claude-haiku-5-5"
+  ],
+  "scorer_v3": "pass",
+  "scorer_reason": "",
+  "answer": "No order in the database is worth more than \u20ac1,000. There are only 8 orders in total, all stored as plain euro amounts, and the most expensive one is \u20ac120.\n\n| Order | Customer | Item | Total (\u20ac) | Date |\n|---|---|---|---|---|\n| 3 | Ben Okafor | Keyboard | 120.00 | 2026-09-02 |\n| 2 | Ana Costa | Monitor arm | 89.00 | 2026-10-30 |\n| 7 | Emil Hansen | Headset | 75.00 | 2026-11-05 |\n| 5 | Chen Wei | Webcam | 65.00 | 2026-11-03 |\n| 8 | Ben Okafor | Mouse | 45.00 | 2026-08-19 |\n| 1 | Ana Costa | Desk lamp | 39.00 | 2026-08-14 |\n| 4 | Chen Wei | USB hub | 25.00 | 2026-10-12 |\n| 6 | Dora Novak | Desk mat | 19.00 | 2026-07-21 |\n\nAdded together, all orders come to \u20ac477, so no single customer has spent more than \u20ac1,000 either. Ben Okafor has spent the most, at \u20ac165. If you were thinking of a specific order, it may be in a different database or not recorded yet."
+ },
+ {
+  "id": "n05",
+  "name": "n05_r1",
+  "judge": "pass",
+  "judge_reason": "The agent says no one else ordered on Dora Novak's day, which matches the empty correct answer.",
+  "judge_cost": 0.0008899400000000001,
+  "judge_model": [
+   "claude-haiku-5-5"
+  ],
+  "scorer_v3": "pass",
+  "scorer_reason": "",
+  "answer": "Nobody else ordered that day. Dora Novak (customer #4, Prague) has one order, a desk mat for \u20ac19.00 on 2026-07-21, and it's the only order in the database from that date.\n\nI also looked at every order date in the table. They're all in the same YYYY-MM-DD format, so no other order from that day was missed because of a different date format. The next order after Dora's was on 2026-08-14."
+ }
+]

@@ -1,0 +1,189 @@
+[
+ {
+  "id": "q01",
+  "kind": "fact",
+  "question": "Which customer placed the last order before October 1, 2026? Give the customer name.",
+  "sql": "SELECT c.name, c.city FROM orders o JOIN customers c ON c.id=o.customer_id WHERE CASE WHEN o.ordered_on LIKE '__/__/____' THEN substr(o.ordered_on,7,4)||'-'||substr(o.ordered_on,4,2)||'-'||substr(o.ordered_on,1,2) ELSE o.ordered_on END < '2026-10-01' ORDER BY CASE WHEN o.ordered_on LIKE '__/__/____' THEN substr(o.ordered_on,7,4)||'-'||substr(o.ordered_on,4,2)||'-'||substr(o.ordered_on,1,2) ELSE o.ordered_on END DESC LIMIT 1",
+  "keys": [
+   "Okafor"
+  ]
+ },
+ {
+  "id": "q02",
+  "kind": "fact",
+  "question": "Which customer has the highest average order value, and what is that average in euros?",
+  "sql": "SELECT c.name, ROUND(AVG(o.total_eur),2) FROM orders o JOIN customers c ON c.id=o.customer_id GROUP BY c.id ORDER BY 2 DESC LIMIT 1",
+  "keys": [
+   "Okafor",
+   82.5
+  ]
+ },
+ {
+  "id": "q03",
+  "kind": "fact",
+  "question": "How much has the customer from Taipei spent in total, in euros?",
+  "sql": "SELECT SUM(o.total_eur) FROM orders o JOIN customers c ON c.id=o.customer_id WHERE TRIM(c.city)='Taipei'",
+  "keys": [
+   90
+  ]
+ },
+ {
+  "id": "q04",
+  "kind": "fact",
+  "question": "Which customer has spent the most money in total, and how much?",
+  "sql": "SELECT c.name, SUM(o.total_eur) t FROM orders o JOIN customers c ON c.id=o.customer_id GROUP BY c.id ORDER BY t DESC LIMIT 1",
+  "keys": [
+   "Okafor",
+   165
+  ]
+ },
+ {
+  "id": "q05",
+  "kind": "fact",
+  "question": "What was the cheapest order, and who placed it?",
+  "sql": "SELECT o.item, c.name FROM orders o JOIN customers c ON c.id=o.customer_id WHERE o.total_eur IS NOT NULL ORDER BY o.total_eur ASC LIMIT 1",
+  "keys": [
+   "Desk mat",
+   "Novak"
+  ]
+ },
+ {
+  "id": "q06",
+  "kind": "fact",
+  "question": "How many customers have never placed an order?",
+  "sql": "SELECT COUNT(*) FROM customers c WHERE NOT EXISTS (SELECT 1 FROM orders o WHERE o.customer_id=c.id)",
+  "keys": [
+   0
+  ]
+ },
+ {
+  "id": "q07",
+  "kind": "fact",
+  "question": "What share of all order revenue came from customers in Lagos? Answer as a percentage.",
+  "sql": "SELECT ROUND(100.0 * SUM(CASE WHEN c.city='Lagos' THEN o.total_eur ELSE 0 END) / SUM(o.total_eur), 1) FROM orders o JOIN customers c ON c.id=o.customer_id",
+  "keys": [
+   {
+    "approx": 32.5,
+    "tol": 0.11
+   }
+  ]
+ },
+ {
+  "id": "q08",
+  "kind": "fact",
+  "question": "What is the total value of all orders, in euros?",
+  "sql": "SELECT SUM(total_eur) FROM orders",
+  "keys": [
+   507
+  ]
+ },
+ {
+  "id": "q09",
+  "kind": "fact",
+  "question": "How many days passed between the first order and the last order?",
+  "sql": "SELECT CAST(julianday(MAX(CASE WHEN ordered_on LIKE '__/__/____' THEN substr(ordered_on,7,4)||'-'||substr(ordered_on,4,2)||'-'||substr(ordered_on,1,2) ELSE ordered_on END)) - julianday(MIN(CASE WHEN ordered_on LIKE '__/__/____' THEN substr(ordered_on,7,4)||'-'||substr(ordered_on,4,2)||'-'||substr(ordered_on,1,2) ELSE ordered_on END)) AS INTEGER) FROM orders",
+  "keys": [
+   112
+  ]
+ },
+ {
+  "id": "q10",
+  "kind": "fact",
+  "question": "Which customer's first order was the most expensive first order of all customers? Give the name.",
+  "sql": "SELECT c.name FROM customers c JOIN orders o ON o.customer_id=c.id WHERE CASE WHEN o.ordered_on LIKE '__/__/____' THEN substr(o.ordered_on,7,4)||'-'||substr(o.ordered_on,4,2)||'-'||substr(o.ordered_on,1,2) ELSE o.ordered_on END=(SELECT MIN(CASE WHEN ordered_on LIKE '__/__/____' THEN substr(ordered_on,7,4)||'-'||substr(ordered_on,4,2)||'-'||substr(ordered_on,1,2) ELSE ordered_on END) FROM orders WHERE customer_id=c.id) ORDER BY o.total_eur DESC LIMIT 1",
+  "keys": [
+   "Hansen"
+  ]
+ },
+ {
+  "id": "q11",
+  "kind": "fact",
+  "question": "In which month was the total order revenue highest, and how much was it in euros?",
+  "sql": "SELECT substr(CASE WHEN ordered_on LIKE '__/__/____' THEN substr(ordered_on,7,4)||'-'||substr(ordered_on,4,2)||'-'||substr(ordered_on,1,2) ELSE ordered_on END,1,7) m, SUM(total_eur) FROM orders GROUP BY m ORDER BY 2 DESC LIMIT 1",
+  "keys": [
+   {
+    "any": [
+     "September",
+     "2026-09",
+     "Sep "
+    ]
+   },
+   150
+  ]
+ },
+ {
+  "id": "q12",
+  "kind": "fact",
+  "question": "What is the most expensive single order, and which customer placed it?",
+  "sql": "SELECT o.item, o.total_eur, c.name FROM orders o JOIN customers c ON c.id=o.customer_id ORDER BY o.total_eur DESC LIMIT 1",
+  "keys": [
+   "Keyboard",
+   "Okafor"
+  ]
+ },
+ {
+  "id": "q13",
+  "kind": "fact",
+  "question": "How many full weeks passed between Ana Costa's first order and her second order?",
+  "sql": "SELECT CAST((julianday(MAX(o.ordered_on)) - julianday(MIN(o.ordered_on))) / 7 AS INTEGER) FROM orders o JOIN customers c ON c.id=o.customer_id WHERE c.name='Ana Costa'",
+  "keys": [
+   11
+  ]
+ },
+ {
+  "id": "q14",
+  "kind": "fact",
+  "question": "Which other item was ordered in the same calendar month as the Headset, and by whom?",
+  "sql": "SELECT o2.item, c.name FROM orders o1 JOIN orders o2 ON substr(CASE WHEN o1.ordered_on LIKE '__/__/____' THEN substr(o1.ordered_on,7,4)||'-'||substr(o1.ordered_on,4,2)||'-'||substr(o1.ordered_on,1,2) ELSE o1.ordered_on END,1,7)=substr(CASE WHEN o2.ordered_on LIKE '__/__/____' THEN substr(o2.ordered_on,7,4)||'-'||substr(o2.ordered_on,4,2)||'-'||substr(o2.ordered_on,1,2) ELSE o2.ordered_on END,1,7) AND o2.id<>o1.id JOIN customers c ON c.id=o2.customer_id WHERE o1.item='Headset'",
+  "keys": [
+   "Webcam",
+   "Chen Wei",
+   "Keyboard stand"
+  ]
+ },
+ {
+  "id": "q15",
+  "kind": "fact",
+  "question": "Which customers have placed only one order? Give their names.",
+  "sql": "SELECT c.name, c.city FROM customers c JOIN orders o ON o.customer_id=c.id GROUP BY c.id HAVING COUNT(*)=1 ORDER BY c.name",
+  "keys": [
+   "Novak",
+   "Okafor"
+  ]
+ },
+ {
+  "id": "n01",
+  "kind": "none",
+  "question": "Which customer lives in Berlin?",
+  "sql": "SELECT name FROM customers WHERE city='Berlin'",
+  "keys": []
+ },
+ {
+  "id": "n02",
+  "kind": "none",
+  "question": "Which customer placed an order in 2024?",
+  "sql": "SELECT DISTINCT c.name FROM orders o JOIN customers c ON c.id=o.customer_id WHERE CASE WHEN o.ordered_on LIKE '__/__/____' THEN substr(o.ordered_on,7,4)||'-'||substr(o.ordered_on,4,2)||'-'||substr(o.ordered_on,1,2) ELSE o.ordered_on END LIKE '2024%'",
+  "keys": []
+ },
+ {
+  "id": "n03",
+  "kind": "none",
+  "question": "Which customer has a name starting with Z?",
+  "sql": "SELECT name FROM customers WHERE name LIKE 'Z%'",
+  "keys": []
+ },
+ {
+  "id": "n04",
+  "kind": "none",
+  "question": "Which order was worth more than 1,000 euros, and who placed it?",
+  "sql": "SELECT o.item, c.name FROM orders o JOIN customers c ON c.id=o.customer_id WHERE o.total_eur > 1000",
+  "keys": []
+ },
+ {
+  "id": "n05",
+  "kind": "none",
+  "question": "Who else placed an order on the same day as Dora Novak?",
+  "sql": "SELECT c2.name FROM orders o1 JOIN customers c1 ON c1.id=o1.customer_id JOIN orders o2 ON CASE WHEN o2.ordered_on LIKE '__/__/____' THEN substr(o2.ordered_on,7,4)||'-'||substr(o2.ordered_on,4,2)||'-'||substr(o2.ordered_on,1,2) ELSE o2.ordered_on END=CASE WHEN o1.ordered_on LIKE '__/__/____' THEN substr(o1.ordered_on,7,4)||'-'||substr(o1.ordered_on,4,2)||'-'||substr(o1.ordered_on,1,2) ELSE o1.ordered_on END AND o2.customer_id<>o1.customer_id JOIN customers c2 ON c2.id=o2.customer_id WHERE c1.name='Dora Novak'",
+  "keys": []
+ }
+]
