@@ -1,6 +1,6 @@
 # ai-agent-evals
 
-The code and run logs behind the video **AI Agent Evals From Scratch: I Ran One Agent 465 Times**: [VIDEO LINK]
+The code and run logs behind the video **AI Agent Evals From Scratch: I Ran One Agent 465 Times**: https://youtu.be/_L1ifPiVIcs
 
 What is here: one tiny shop database (`shop.db`, made-up data: 5 customers, 8 orders), one MCP server
 (`db_server.py`, three read-only tools), Claude Code run headless as the agent, and an eval: 20 questions with a reviewed true
